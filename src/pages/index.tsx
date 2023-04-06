@@ -1,3 +1,5 @@
+import AnimatedText from "@/components/AnimatedText";
+import { calculatedFromTimeWakeup } from "@/utils/functions";
 import {
   ArrowBackIcon,
   ArrowForwardIcon,
@@ -15,30 +17,10 @@ import {
   ListIcon,
   UnorderedList,
   Link,
+  useColorModeValue
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useState } from "react";
-
-const calculatedFromTimeSleep = (time: Date) => {
-  const result = [...Array(4)].map((_: undefined, index: number) => {
-    const i = index + 1;
-    const resultDate = new Date(time);
-    resultDate.setMinutes(i * 90 + 15);
-    return resultDate;
-  });
-  return result;
-};
-
-const calculatedFromTimeWakeup = (time: Date) => {
-  const fullMinutes = 555;
-  const result = [...Array(4)].map((_: undefined, index: number) => {
-    const i = index + 1;
-    const resultDate = new Date(time);
-    resultDate.setMinutes(resultDate.getMinutes() - (fullMinutes - index * 90));
-    return resultDate;
-  });
-  return result;
-};
 
 type timeResult = {
   time: Date;
@@ -51,7 +33,6 @@ export default function Home() {
   const [ampm, setAmpm] = useState<string>("AM");
 
   const [timeWakeup, setTimeWakeup] = useState<timeResult>();
-  console.log("🚀 ~ file: index.tsx:37 ~ Home ~ timeWakeup:", timeWakeup);
 
   const handleSubmit = () => {
     const now = new Date();
@@ -69,6 +50,8 @@ export default function Home() {
       listResult: result,
     });
   };
+
+  const keyMotion = useColorModeValue("light", "dark");
 
   return (
     <Container
@@ -128,79 +111,79 @@ export default function Home() {
           </Box>
         </Box>
       ) : (
-        <Box borderRadius="lg" p={3} mb={6} textAlign="center" flex="1 1">
-          <Text as="h1" fontSize="2.2rem" fontWeight="bold" mb={8}>
-            I have to wake up at <TimeDisplay time={timeWakeup.time} />
-          </Text>
-          {timeWakeup?.listResult?.length > 0 && (
-            <>
-              <Text as="div" mb={8}>
-                <strong>Go to bed</strong> at one of the following times:
-              </Text>
-              <List display="flex" justifyContent="space-around" mb={8}>
-                {timeWakeup.listResult.map((result, index) => {
-                  const cycles = 6 - index;
-                  const hours = 9 - 1.5 * index;
-                  let color = "green.500";
-                  if (cycles < 5) color = "orange.500";
-                  return (
-                    <ListItem key={result.getTime()}>
-                      <Box
-                        border="1px solid"
-                        borderColor={color}
-                        padding={2}
-                        borderRadius="sm"
-                      >
+          <Box borderRadius="lg" p={3} mb={6} textAlign="center" flex="1 1">
+            <Text as="h1" fontSize="2.2rem" fontWeight="bold" mb={8}>
+              I have to wake up at <TimeDisplay time={timeWakeup.time} />
+            </Text>
+            {timeWakeup?.listResult?.length > 0 && (
+              <>
+                <Text as={AnimatedText} element="p" mb={8}>
+                  <strong>Go to bed</strong> at one of the following times:
+                </Text>
+                <List display="flex" justifyContent="space-around" mb={8}>
+                  {timeWakeup.listResult.map((result, index) => {
+                    const cycles = 6 - index;
+                    const hours = 9 - 1.5 * index;
+                    let color = "green.500";
+                    if (cycles < 5) color = "orange.500";
+                    return (
+                      <ListItem key={result.getTime()}>
                         <Box
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
+                          border="1px solid"
+                          borderColor={color}
+                          padding={2}
+                          borderRadius="sm"
                         >
-                          <ListIcon as={CheckCircleIcon} color={color} />
-                          <TimeDisplay time={result} />
+                          <Box
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            <ListIcon as={CheckCircleIcon} color={color} />
+                            <TimeDisplay time={result} />
+                          </Box>
+                          <Text as="span" fontSize="0.825rem" color={color}>
+                            {`${cycles} cycles (${hours}hrs)`}
+                          </Text>
                         </Box>
-                        <Text as="span" fontSize="0.825rem" color={color}>
-                          {`${cycles} cycles (${hours}hrs)`}
-                        </Text>
-                      </Box>
-                    </ListItem>
-                  );
-                })}
-              </List>
-              <UnorderedList mb={16} textAlign="left" spacing={2}>
-                <ListItem>
-                  The average adult human takes <strong>fifteen minutes</strong>{" "}
-                  to fall asleep.
-                </ListItem>
-                <ListItem>
-                  sleepytime works by counting backwards in{" "}
-                  <strong>sleep cycles</strong>. Sleep cycles typically last{" "}
-                  <strong>90 minutes</strong>.
-                </ListItem>
-                <ListItem>
-                  Waking up in the middle of a sleep cycle leaves you feeling
-                  tired and groggy, but waking up <i>in between</i> cycles lets
-                  you wake up feeling refreshed and alert!
-                </ListItem>
-                <ListItem>
-                  {`We're working on a sleepytime app.`} &nbsp;
-                  <Link as={NextLink} href="#" textDecoration="underline">
-                    {`Get notified when it's ready`}
-                  </Link>
-                </ListItem>
-              </UnorderedList>
-              <Box>
-                <Button
-                  leftIcon={<ArrowBackIcon />}
-                  colorScheme="purple"
-                  onClick={() => setTimeWakeup(undefined)}
-                >
-                  Back
-                </Button>
-              </Box>
-            </>
-          )}
-        </Box>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+                <UnorderedList mb={16} textAlign="left" spacing={2}>
+                  <ListItem>
+                    The average adult human takes{" "}
+                    <strong>fifteen minutes</strong> to fall asleep.
+                  </ListItem>
+                  <ListItem>
+                    sleepytime works by counting backwards in{" "}
+                    <strong>sleep cycles</strong>. Sleep cycles typically last{" "}
+                    <strong>90 minutes</strong>.
+                  </ListItem>
+                  <ListItem>
+                    Waking up in the middle of a sleep cycle leaves you
+                    feeling tired and groggy, but waking up <i>in between</i>{" "}
+                    cycles lets you wake up feeling refreshed and alert!
+                  </ListItem>
+                  <ListItem>
+                    {`We're working on a sleepytime app.`} &nbsp;
+                    <Link as={NextLink} href="#" textDecoration="underline">
+                      {`Get notified when it's ready`}
+                    </Link>
+                  </ListItem>
+                </UnorderedList>
+                <Box>
+                  <Button
+                    leftIcon={<ArrowBackIcon />}
+                    colorScheme="purple"
+                    onClick={() => setTimeWakeup(undefined)}
+                  >
+                    Back
+                  </Button>
+                </Box>
+              </>
+            )}
+          </Box>
       )}
     </Container>
   );
